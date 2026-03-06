@@ -1,6 +1,7 @@
 async function scanJob() {
     const text = document.getElementById('jobText').value;
     const resultDiv = document.getElementById('result');
+    const btn = document.getElementById('scanBtn');
     
     if (!text.trim()) {
         alert("Please paste some text first.");
@@ -8,7 +9,8 @@ async function scanJob() {
     }
 
     resultDiv.style.display = 'block';
-    resultDiv.innerText = "Scanning document...";
+    resultDiv.innerHTML = "⏳ Scanning document...";
+    btn.disabled = true;
 
     try {
         const response = await fetch('http://127.0.0.1:8000/scan', {
@@ -18,8 +20,13 @@ async function scanJob() {
         });
         
         const data = await response.json();
-        resultDiv.innerText = data.result;
+        
+        // marked.parse() reads the markdown and creates the bold/italic HTML
+        resultDiv.innerHTML = marked.parse(data.result);
+        
     } catch (error) {
-        resultDiv.innerText = "Error connecting to the backend. Make sure Python is running!";
+        resultDiv.innerHTML = "❌ Error connecting to the backend. Is Python running?";
+    } finally {
+        btn.disabled = false;
     }
 }
